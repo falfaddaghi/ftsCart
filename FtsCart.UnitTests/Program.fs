@@ -36,4 +36,17 @@ let `` buyitems from empty cart should'nt be allowed``()=
     let cart={id=4;items=[]}
     let newCart=buyItems cart
     Assert.NotEqual(cart.items.Length,0)
+
+(*
+requirements to be added.
+- calculate total
+- add quantities 
+- remove item from a cart
+- presist shopping cart (save cart and retrieve it by userID (current)  
+    - rules 
+        - (no two aactive shopping carts at the same time for the same user)        
     
+- history (previous orders)
+- shipping (add shipping address, cost(this is a fixed amount for now))
+
+*)    
