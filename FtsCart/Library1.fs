@@ -7,16 +7,17 @@ type Item=
         id:Id
         name:Name
         price:Price
+        quantity:int
     }
 type ActiveCartData=
     {
-        items:Item list
         id:Id
+        items:Item list
     }
 type BoughtCartData=
     {
-        items:Item list
         id:Id
+        items:Item list
         totalPrice:float
     }
 type EmptyCartData=
@@ -29,13 +30,13 @@ type UserCart=
 |BoughtCart of BoughtCartData 
  module transition=
     let calculateTotalPriceActiveCart (cart:ActiveCartData) =
-        cart.items|>List.sumBy(fun item->item.price)
+        cart.items|>List.sumBy(fun item->float item.price* float item.quantity)
     let addItemToEmptyCart (c:EmptyCartData) item=
         ActiveCart{id=c.id;items=[item]}
     let addItemToActiveCart (ac:ActiveCartData) item=
         ActiveCart{ac with items=item::ac.items}       
-    let removItemFromActiveCart (ac:ActiveCartData) item=
-        let newItems=ac.items|>List.filter(fun x->x=item)
+    let removItemFromActiveCart (ac:ActiveCartData) itemId=
+        let newItems=ac.items|>List.filter(fun x->x.id=itemId)
         ActiveCart{ac with items=newItems}
     let BuyItemsOfActiveCart (ac:ActiveCartData) =
         let items=ac.items
