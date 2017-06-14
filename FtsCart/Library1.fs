@@ -2,6 +2,11 @@
 type Id =int
 type Name=string
 type Price=float
+type ShippingInfo=
+    {
+        shippingAddress:string
+        shippingCost:Price
+    }
 type Item=
     {
         id:Id
@@ -13,6 +18,7 @@ type ActiveCartData=
     {
         id:Id
         items:Item list
+        shippingInfo:ShippingInfo option
     }
 type BoughtCartData=
     {
