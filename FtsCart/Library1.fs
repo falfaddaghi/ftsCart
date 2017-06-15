@@ -7,6 +7,10 @@ type ShippingInfo=
         shippingAddress:string
         shippingCost:Price
     }
+type EmptyCartData=
+    {
+        id:Id
+    }
 type Item=
     {
         id:Id
@@ -26,10 +30,6 @@ type BoughtCartData=
         items:Item list
         totalPrice:float
     }
-type EmptyCartData=
-    {
-        id:Id
-    }
 type UserCart=
 |EmptyCart of EmptyCartData
 |ActiveCart of ActiveCartData
@@ -37,7 +37,7 @@ type UserCart=
 type User=
     {
         id:Id
-        userCart:ActiveCartData
+        currentCart:UserCart
         history:BoughtCartData list
 
     }
@@ -82,6 +82,13 @@ type User=
             {item with quantity=item.quantity-1}
         else 
             item
+    let addActiveCartToUser (usr:User) (cart:ActiveCartData)=
+        {usr with currentCart=ActiveCart cart}
+
+    let addEmptyToUser (usr:User) (cart:EmptyCartData)=
+        {usr with currentCart=EmptyCart cart}
+
+        
         
      
     
