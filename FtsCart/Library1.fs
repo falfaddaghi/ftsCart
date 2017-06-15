@@ -54,7 +54,7 @@ type User=
         ActiveCart{ac with items=item::ac.items}       
 
     let removItemFromActiveCart (ac:ActiveCartData) itemId=
-        let newItems=ac.items|>List.filter(fun x->x.id=itemId)
+        let newItems=ac.items|>List.filter(fun x->x.id<>itemId)
         ActiveCart{ac with items=newItems}
 
     let BuyItemsOfActiveCart (ac:ActiveCartData) =
