@@ -54,7 +54,7 @@ type User=
     let addItemToActiveCart (ac:ActiveCartData) item=
         ActiveCart{ac with items=item::ac.items}       
 
-    let removItemFromActiveCart (ac:ActiveCartData) itemId=
+    let removeItemFromActiveCart (ac:ActiveCartData) itemId=
         let newItems=ac.items|>List.filter(fun x->x.id<>itemId)
         if newItems.Length =0 then
             EmptyCart{id=ac.id}
@@ -86,13 +86,11 @@ type User=
             {item with quantity=item.quantity-1}
         else 
             item
-    let addActiveCartToUser (usr:User) (cart:ActiveCartData)=
-        {usr with currentCart=ActiveCart cart}
-
-    let addEmptyToUser (usr:User) (cart:EmptyCartData)=
-        {usr with currentCart=EmptyCart cart}
-
-        
-        
-     
-    
+    let userCheckout user:User =
+        match user.currentCart with 
+        |ActiveCart ac->
+            match BuyItemsOfActiveCart ac with
+            |ActiveCart s->user
+            |BoughtCart b->
+                {user with history=b::user.history ;currentCart=EmptyCart{id=2}}
+        |_->user
