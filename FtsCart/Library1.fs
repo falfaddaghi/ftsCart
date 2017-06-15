@@ -55,6 +55,9 @@ type User=
 
     let removItemFromActiveCart (ac:ActiveCartData) itemId=
         let newItems=ac.items|>List.filter(fun x->x.id<>itemId)
+        if newItems.Length =0 then
+            EmptyCart{id=ac.id}
+        else
         ActiveCart{ac with items=newItems}
 
     let BuyItemsOfActiveCart (ac:ActiveCartData) =
