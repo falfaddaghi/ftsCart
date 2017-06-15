@@ -29,6 +29,7 @@ type BoughtCartData=
         id:Id
         items:Item list
         totalPrice:float
+        shippingInfo:ShippingInfo 
     }
 type UserCart=
 |EmptyCart of EmptyCartData
@@ -69,18 +70,18 @@ type User=
                 ac
                 |>calculatePriceOfItems
                 |>calculateTotalPriceWithShipping s.shippingCost
-            BoughtCart{id=ac.id;items=ac.items;totalPrice=totalPrice}
+            BoughtCart{id=ac.id;items=ac.items;totalPrice=totalPrice;shippingInfo=s}
 
-    let changeShippingInfoToActiveCart (ac:ActiveCartData) (info:ShippingInfo)=
+    let changeShippingInfoOfActiveCart (ac:ActiveCartData) (info:ShippingInfo)=
         {ac with shippingInfo=Some info}
     let changeItemQuantity q (item:Item )=
         if q>0 then
             {item with quantity=q} 
         else
             item
-    let IncreamentQuantity (item:Item)=
+    let incrementQuantity (item:Item)=
         {item with quantity=item.quantity+1}
-    let DecreamentQuantity (item:Item)=
+    let decrementQuantity (item:Item)=
         if item.quantity > 1 then
             {item with quantity=item.quantity-1}
         else 

@@ -2,49 +2,98 @@
 // See the 'F# Tutorial' project for more help.
 open System
 open Xunit
+open FsUnit.Xunit
 open FtsCart
 open FtsCart.transition
-
-[<Fact>]
-let ``test`` () =
-    let x={id=1;name="hello";price=10.}
-    Assert.Equal(x.id,1)
-[<Fact>]
-let ``adding to and empty cart give gives correct result``()=
-    let cart={id=1;items=[]}
-    let item={id=1;name="item";price=10.}
-    let newCart=addItem cart item
-    Assert.Equal(newCart.items.Head,item)
-    Assert.Equal(newCart.items.Length,1)
-[<Fact>]
-let ``add item to  non empty cart gives correct result``()=
-    let item1={id=1;name="item1";price=10.}
-    let item2={id=2;name="item2";price=20.}
-    let cart={id=2;items=[item1]}
-    let newCart=addItem cart item2
-    Assert.Equal(newCart.items.Head,item2)
-    Assert.Equal(newCart.items.Length,2)
-[<Fact>]
-let `` buy items in the non empty cart gives empty cart`` ()=
-    let item1={id=1;name="item1";price=10.}
-    let item2={id=2;name="item2";price=20.}
-    let cart={id=3;items=[item1;item2]}
-    let newCart=buyItems cart
-    Assert.Equal(newCart.items.Length,0)
-[<Fact>]
-let `` buyitems from empty cart should'nt be allowed``()=
-    let cart={id=4;items=[]}
-    let newCart=buyItems cart
-    Assert.NotEqual(cart.items.Length,0)
-
-(*
-requirements to be added.
+open Expecto 
+let tests =
+  testList "A test group" [
+      test "addItemToEmptyCart_emptycart_returnsActivCart" {
+        let e={id=1} :EmptyCartData
+        let item={id=1;name="item1";quantity=1;price=5.}
+        let actual=addItemToEmptyCart e item
+        let expected=ActiveCart{id=1;items=[item];shippingInfo=None}
+        Expect.equal (actual) (expected) "hello"
+      }
+      test "addItemToEmptyCart_addTwoItemstoEmptyCart_retursActiveCart"{
+        let item1={id=1;name="item1";quantity=1;price=5.}
+        let item2={id=1;name="item2";quantity=1;price=5.}
+        let active={id=1;items=[item1];shippingInfo=None}
+        let actual=addItemToActiveCart active item2
+        let expected=ActiveCart{id=1;items=[item2;item1];shippingInfo=None}
+        Expect.equal actual expected "hello there"
+      }
+      test "remove item from active cart with items more than 1"{
+        let item1={id=1;name="item1";quantity=1;price=5.}
+        let item2={id=2;name="item2";quantity=1;price=5.}
+        let active={id=1;items=[item2;item1];shippingInfo=None}
+        let actual=removItemFromActiveCart active item1.id
+        let expected=ActiveCart{id=1;items=[item2];shippingInfo=None}
+        Expect.equal actual expected "another hi"
+      }
+      test "remov ite from active with 1 item "{
+        let item1={id=1;name="item1";quantity=1;price=5.}
+        let active={id=1;items=[item1];shippingInfo=None}
+        let actual=removItemFromActiveCart active item1.id
+        let expected=EmptyCart{id=1}
+        Expect.equal actual expected "another hi"
+      }
+      test "buy items of the active cart that has no shipping info"{
+        let item1={id=1;name="item1";quantity=1;price=5.}
+        let active={id=1;items=[item1];shippingInfo=None}
+        let actual=BuyItemsOfActiveCart active 
+        let expected=ActiveCart{id=1;items=[item1];shippingInfo=None}
+        Expect.equal actual expected "another hi"
+      }
+      test "buy items of active cart with shipping info"{
+        let item1={id=1;name="item1";quantity=1;price=5.}
+        let active={id=1;items=[item1];shippingInfo=Some {shippingAddress="Nablus";shippingCost=50.}}
+        let actual=BuyItemsOfActiveCart active 
+        let expected=BoughtCart{id=1;items=[item1];totalPrice=55.;shippingInfo={shippingAddress="Nablus";shippingCost=50.}}
+        Expect.equal actual expected "another hi"
+      }
+      test "changeItemQuantity to less than 1 doesn't change quantity"{
+        let item1={id=1;name="item1";quantity=1;price=5.}
+        let actual=changeItemQuantity 0 item1
+        let expected=item1
+        Expect.equal actual expected "another hi"
+      }
+      test "changeItemQuantity to any value >=1  changes the quantity"{
+        let item1={id=1;name="item1";quantity=1;price=5.}
+        let actual=changeItemQuantity 10 item1
+        let expected={id=1;name="item1";quantity=10;price=5.}
+        Expect.equal actual expected "another hi"
+      }
+      test "inrementQuantity returns item with quantity increamneted by 1"{
+        let item1={id=1;name="item1";quantity=1;price=5.}
+        let actual=incrementQuantity item1
+        let expected={id=1;name="item1";quantity=2;price=5.}
+        Expect.equal actual expected "another hi"
+      }
+      test "decrementQuantity  less than 1 returns item with quantity = 1"{
+        let item1={id=1;name="item1";quantity=1;price=5.}
+        let actual=decrementQuantity item1
+        let expected={id=1;name="item1";quantity=1;price=5.}
+        Expect.equal actual expected "another hi"
+      }
+      test "decrementQuantity  with qunatity >1 returns item with quantity decremented by 1"{
+        let item1={id=1;name="item1";quantity=50;price=5.}
+        let actual=decrementQuantity item1
+        let expected={id=1;name="item1";quantity=49;price=5.}
+        Expect.equal actual expected "another hi"
+      }
+    ]
+[<EntryPoint>]
+let main args =
+  runTestsWithArgs defaultConfig args tests
+(*to be added.
 - calculate total
 - add quantities 
 - remove item from a cart
 - presist shopping cart (save cart and retrieve it by userID (current)  
     - rules 
-        - (no two aactive shopping carts at the same time for the same user)        
+        
+requirements - (no two aactive shopping carts at the same time for the same user)        
     
 - history (previous orders)
 - shipping (add shipping address, cost(this is a fixed amount for now))
